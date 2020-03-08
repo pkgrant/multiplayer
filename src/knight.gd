@@ -2,24 +2,54 @@ extends KinematicBody2D
 
 export (int) var speed = 100
 
-var velocity 	= Vector2()
-var moving   	= false
-var orientation = 0
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
+var velocity 	    = Vector2()
+var moving   	    = false
+var idle		    = true
+var attack		    = false
+var orientation     = 0
+var animation       = "idle"
+var attack_anims    = ["attack1", "attack2", "attack3"]
+var i = 0;
+var attack_cooldown = .28
+var cd				= .0
 
 func _physics_process(delta):
-	update()
-	velocity = move_and_slide(velocity)
+	update_knight(delta)
+	
+	if !attack:
+		velocity = move_and_slide(velocity)
 
-func update():
+func update_knight(delta):
+	
 	move()
 	face()
 	
-	play_attack_animation()
+	#check attack first
+	if !attack:
+		if (Input.is_action_just_pressed("click") or
+			Input.is_action_pressed("click")):
+				
+			$AnimationPlayer.play(attack_anims[i])
+			i = (i + 1) % 3
+			attack = true
+		
+	if attack:
+		moving = false
+		cd = cd + delta
+		if cd > attack_cooldown:
+			attack = false
+			cd 	   = 0
+	
+	if attack:
+		pass
+	elif moving:
+		animation = "walk"
+		play_animation(animation)
+	elif idle:
+		animation = "idle"
+		play_animation(animation)
+	
+	
 
 func move():
 	velocity = Vector2()
@@ -27,7 +57,7 @@ func move():
 		velocity.x += 1
 		moving = true
 	if Input.is_action_pressed("left"):
-		velocity.x += -1
+		velocity.x -= 1
 		moving = true
 	if Input.is_action_pressed("down"):
 		velocity.y += 1
@@ -37,10 +67,11 @@ func move():
 		moving = true
 
 	velocity = velocity.normalized() * speed
+	idle 	 = false
 	
 	if velocity.length() == 0:
 		moving = false
-	play_walk_animation()
+		idle   = true
 
 func face():
 	#Need a way to preserve diagonal movement to face, it's really sensative
@@ -50,13 +81,12 @@ func face():
 	else:
 		rotation = orientation
 
-func play_walk_animation():
-	if moving:		
-		#REFACTOR ANIMATION STATES SO ONLY ONE CAN PLAY AT A TIME
-		$AnimationPlayer.play("walk")
-	else:
-		$AnimationPlayer.play("idle")
+func attack():
+	pass
+
+func play_animation(act):
+	$AnimationPlayer.play(act)
 		
-func play_attack_animation():
+func attack_animator(delta):
 	if Input.is_action_just_pressed("click"):
 		$AnimationPlayer.play("attack1")

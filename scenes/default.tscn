@@ -21,7 +21,6 @@
 [sub_resource type="Animation" id=3]
 resource_name = "attack1"
 length = 0.2
-loop = true
 step = 0.05
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:frame")
@@ -39,7 +38,6 @@ tracks/0/keys = {
 [sub_resource type="Animation" id=4]
 resource_name = "attack2"
 length = 0.2
-loop = true
 step = 0.05
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:frame")
@@ -119,7 +117,7 @@ script = ExtResource( 3 )
 texture = ExtResource( 2 )
 vframes = 5
 hframes = 4
-frame = 10
+frame = 7
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="KinematicBody2D"]
 shape = SubResource( 2 )
